@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#075E54">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <title>Audit Arrival Reporter</title>
+  <link rel="manifest" href="manifest.json">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --wa-dark: #075E54;
+      --wa-green: #25D366;
+      --wa-light-green: #128C7E;
+      --wa-bubble: #d9fdd3;
+      --wa-bubble-dark: #005c4b;
+      --bg: #0f172a;
+      --card-bg: #1e293b;
+      --input-bg: #334155;
+      --text: #f8fafc;
+      --text-muted: #94a3b8;
+      --border: #475569;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 16px;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 440px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      padding-bottom: 24px;
+    }
+
+    /* Live Clock Banner */
+    .clock-card {
+      background: linear-gradient(135deg, #064e3b 0%, #065f46 100%);
+      border: 1px solid #059669;
+      border-radius: 20px;
+      padding: 20px;
+      text-align: center;
+      box-shadow: 0 10px 25px -5px rgba(5, 150, 105, 0.3);
+    }
+
+    .live-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(0, 0, 0, 0.25);
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      color: #6ee7b7;
+      margin-bottom: 8px;
+    }
+
+    .live-dot {
+      width: 8px;
+      height: 8px;
+      background-color: #34d399;
+      border-radius: 50%;
+      animation: pulse 1.5s infinite;
+    }
+
+    @keyframes pulse {
+      0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(52, 211, 153, 0.7); }
+      70% { transform: scale(1.1); box-shadow: 0 0 0 8px rgba(52, 211, 153, 0); }
+      100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(52, 211, 153, 0); }
+    }
+
+    .clock-time {
+      font-size: 38px;
+      font-weight: 800;
+      letter-spacing: 1px;
+      color: #ffffff;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .clock-date {
+      font-size: 13px;
+      color: #a7f3d0;
+      margin-top: 4px;
+      font-weight: 500;
+    }
+
+    /* Main Form Card */
+    .card {
+      background-color: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 20px;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    }
+
+    .field-group {
+      margin-bottom: 16px;
+    }
+
+    .field-label {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-muted);
+      margin-bottom: 6px;
+    }
+
+    .input-box {
+      width: 100%;
+      background-color: var(--input-bg);
+      border: 1.5px solid var(--border);
+      border-radius: 12px;
+      padding: 12px 14px;
+      color: var(--text);
+      font-size: 15px;
+      font-weight: 500;
+      transition: all 0.2s;
+    }
+
+    .input-box:focus {
+      outline: none;
+      border-color: var(--wa-green);
+      box-shadow: 0 0 0 3px rgba(37, 211, 102, 0.2);
+    }
+
+    /* Client Place Chips / Suggestions */
+    .chips-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 8px;
+    }
+
+    .chip {
+      background: #334155;
+      border: 1px solid #475569;
+      color: #cbd5e1;
+      padding: 4px 10px;
+      border-radius: 14px;
+      font-size: 11px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .chip:active {
+      transform: scale(0.95);
+      background: var(--wa-light-green);
+      color: #fff;
+    }
+
+    /* WhatsApp Preview Card */
+    .preview-section {
+      margin-top: 6px;
+    }
+
+    .preview-header {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-muted);
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .wa-chat-container {
+      background: #0b141a;
+      background-image: radial-gradient(#1f2c34 1px, transparent 1px);
+      background-size: 16px 16px;
+      border-radius: 14px;
+      padding: 14px;
+      display: flex;
+      justify-content: flex-end;
+      border: 1px solid #1f2c34;
+    }
+
+    .wa-bubble {
+      background-color: var(--wa-bubble-dark);
+      color: #e9edef;
+      border-radius: 10px 0 10px 10px;
+      padding: 8px 12px 6px 12px;
+      max-width: 88%;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
+      position: relative;
+    }
+
+    .bubble-line {
+      font-size: 14px;
+      line-height: 1.45;
+      word-break: break-word;
+    }
+
+    .bubble-line.name {
+      font-weight: 600;
+      color: #ffffff;
+    }
+
+    .bubble-line.place {
+      font-weight: 400;
+      color: #e9edef;
+    }
+
+    .bubble-line.time {
+      font-weight: 500;
+      color: #e9edef;
+    }
+
+    .bubble-meta {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 3px;
+      margin-top: 4px;
+      font-size: 10px;
+      color: #8696a0;
+    }
+
+    .ticks {
+      color: #53bdeb;
+      font-size: 13px;
+      line-height: 1;
+    }
+
+    /* Action Buttons */
+    .actions {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-top: 4px;
+    }
+
+    .btn {
+      width: 100%;
+      border: none;
+      border-radius: 14px;
+      padding: 16px 20px;
+      font-size: 16px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn:active {
+      transform: scale(0.98);
+    }
+
+    .btn-whatsapp {
+      background: linear-gradient(135deg, #25D366 0%, #128C7E 100%);
+      color: #ffffff;
+      box-shadow: 0 10px 20px -5px rgba(37, 211, 102, 0.4);
+    }
+
+    .btn-copy {
+      background-color: #334155;
+      color: #f1f5f9;
+      border: 1px solid #475569;
+      font-size: 14px;
+      padding: 12px;
+    }
+
+    /* Toast notification */
+    .toast {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%) translateY(100px);
+      background: #10b981;
+      color: #ffffff;
+      padding: 10px 20px;
+      border-radius: 30px;
+      font-size: 13px;
+      font-weight: 600;
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+      opacity: 0;
+      transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+      z-index: 100;
+      pointer-events: none;
+    }
+
+    .toast.show {
+      transform: translateX(-50%) translateY(0);
+      opacity: 1;
+    }
+
+    /* Quick settings / format options */
+    .format-row {
+      display: flex;
+      gap: 8px;
+      margin-top: 4px;
+    }
+
+    .format-btn {
+      flex: 1;
+      padding: 6px;
+      background: #334155;
+      border: 1px solid #475569;
+      border-radius: 8px;
+      color: #cbd5e1;
+      font-size: 11px;
+      font-weight: 600;
+      cursor: pointer;
+      text-align: center;
+    }
+
+    .format-btn.active {
+      background: var(--wa-light-green);
+      border-color: var(--wa-green);
+      color: #fff;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <!-- Live Clock -->
+    <div class="clock-card">
+      <div class="live-badge">
+        <span class="live-dot"></span> Live Clock
+      </div>
+      <div class="clock-time" id="liveClock">00:00:00 AM</div>
+      <div class="clock-date" id="liveDate">Loading date...</div>
+    </div>
+
+    <!-- Main Card -->
+    <div class="card">
+      <!-- Intern Name -->
+      <div class="field-group">
+        <div class="field-label">
+          <span>Intern Name (Row 1)</span>
+          <span style="font-size: 10px; color: #64748b;">Auto-Saved</span>
+        </div>
+        <input type="text" id="nameInput" class="input-box" value="M. R. Ajmal" placeholder="Enter full name">
+      </div>
+
+      <!-- Client Location -->
+      <div class="field-group">
+        <div class="field-label">
+          <span>Client Place (Row 2)</span>
+          <span style="font-size: 10px; color: #64748b;">Auto-Saved</span>
+        </div>
+        <input type="text" id="placeInput" class="input-box" value="Jayalanka Delivery Center" placeholder="e.g. Jayalanka Delivery Center">
+        
+        <!-- Quick Place Chips for frequent audit clients -->
+        <div class="chips-container" id="recentChips">
+          <span class="chip" onclick="setPlace('Jayalanka Delivery Center')">Jayalanka Delivery Center</span>
+          <span class="chip" onclick="setPlace('Head Office')">Head Office</span>
+          <span class="chip" onclick="setPlace('Branch Office')">Branch Office</span>
+        </div>
+      </div>
+
+      <!-- Time Format Choice -->
+      <div class="field-group">
+        <div class="field-label">
+          <span>Time Style (Row 3)</span>
+        </div>
+        <div class="format-row">
+          <button class="format-btn active" id="fmt1" onclick="setFormat('dot')">9.00AM (Screenshot style)</button>
+          <button class="format-btn" id="fmt2" onclick="setFormat('colon')">9:00 AM (Standard)</button>
+        </div>
+      </div>
+
+      <!-- WhatsApp Live Message Preview -->
+      <div class="preview-section">
+        <div class="preview-header">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" style="color: #25D366;">
+            <path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.711 2.598 2.669-.699c.969.53 1.771.82 2.791.82 3.181 0 5.768-2.587 5.768-5.766.001-3.18-2.585-5.766-5.768-5.766zm9.969 5.766c0 5.514-4.486 10-10 10-1.748 0-3.385-.45-4.814-1.238l-7.186 1.882 1.916-7.001c-.858-1.487-1.352-3.21-1.352-5.043 0-5.514 4.486-10 10-10s10 4.486 10 10z"/>
+          </svg>
+          Live Message Preview
+        </div>
+        <div class="wa-chat-container">
+          <div class="wa-bubble">
+            <div class="bubble-line name" id="previewName">M. R. Ajmal</div>
+            <div class="bubble-line place" id="previewPlace">Jayalanka Delivery Center</div>
+            <div class="bubble-line time" id="previewTime">9.00AM</div>
+            <div class="bubble-meta">
+              <span id="previewStamp">00:00</span>
+              <span class="ticks">✓✓</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Actions -->
+    <div class="actions">
+      <button class="btn btn-whatsapp" onclick="sendToWhatsApp()">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M17.472 14.382c-.301-.15-1.782-.879-2.058-.979-.276-.1-.476-.15-.677.15-.201.3-.777.979-.953 1.18-.175.201-.351.226-.652.075s-1.272-.469-2.423-1.496c-.896-.798-1.501-1.784-1.677-2.085-.175-.301-.019-.464.132-.614.136-.135.301-.351.452-.527.15-.175.201-.3.301-.501.101-.201.05-.376-.025-.526s-.677-1.63-.928-2.233c-.244-.587-.493-.507-.677-.517-.175-.01-.376-.01-.577-.01s-.527.075-.803.376c-.276.301-1.053 1.028-1.053 2.508s1.078 2.908 1.229 3.109c.15.201 2.122 3.24 5.14 4.544.718.31 1.279.496 1.716.635.721.23 1.377.197 1.896.12.578-.087 1.782-.728 2.033-1.43.251-.702.251-1.304.175-1.43-.075-.125-.276-.2-.577-.35zM12.031 21.8c-1.748 0-3.385-.45-4.814-1.238l-7.186 1.882 1.916-7.001c-.858-1.487-1.352-3.21-1.352-5.043 0-5.514 4.486-10 10-10s10 4.486 10 10-4.486 10-10 10zm0-18.2c-4.521 0-8.2 3.679-8.2 8.2 0 1.545.431 2.99 1.18 4.234l-1.242 4.54 4.671-1.224c1.206.702 2.597 1.1 4.071 1.1 4.521 0 8.2-3.679 8.2-8.2s-3.679-8.2-8.2-8.2z"/>
+        </svg>
+        Send to WhatsApp
+      </button>
+
+      <button class="btn btn-copy" onclick="copyMessage()">
+        📋 Copy Formatted Text
+      </button>
+    </div>
+  </div>
+
+  <div id="toast" class="toast">Message copied to clipboard!</div>
+
+  <script>
+    // State management
+    let timeFormat = localStorage.getItem('audit_time_format') || 'dot'; // 'dot' e.g. 9.00AM, 'colon' e.g. 9:00 AM
+
+    const nameInput = document.getElementById('nameInput');
+    const placeInput = document.getElementById('placeInput');
+    const liveClock = document.getElementById('liveClock');
+    const liveDate = document.getElementById('liveDate');
+    const previewName = document.getElementById('previewName');
+    const previewPlace = document.getElementById('previewPlace');
+    const previewTime = document.getElementById('previewTime');
+    const previewStamp = document.getElementById('previewStamp');
+    const toast = document.getElementById('toast');
+
+    // Load saved data
+    if (localStorage.getItem('audit_name')) {
+      nameInput.value = localStorage.getItem('audit_name');
+    }
+    if (localStorage.getItem('audit_place')) {
+      placeInput.value = localStorage.getItem('audit_place');
+    }
+
+    // Format helper
+    function getFormattedTime(date, format) {
+      let hours = date.getHours();
+      const minutes = date.getMinutes();
+      const ampm = hours >= 12 ? 'PM' : 'AM';
+      hours = hours % 12;
+      hours = hours ? hours : 12; // 0 becomes 12
+      const strMinutes = minutes < 10 ? '0' + minutes : minutes;
+
+      if (format === 'dot') {
+        return `${hours}.${strMinutes}${ampm}`; // Matches screenshot e.g. 9.00AM
+      } else {
+        return `${hours}:${strMinutes} ${ampm}`;
+      }
+    }
+
+    function updateClockAndPreview() {
+      const now = new Date();
+
+      // Update Live Clock Display
+      const clockHours = now.getHours();
+      const clockMinutes = String(now.getMinutes()).padStart(2, '0');
+      const clockSeconds = String(now.getSeconds()).padStart(2, '0');
+      const clockAmpm = clockHours >= 12 ? 'PM' : 'AM';
+      const displayHours = clockHours % 12 || 12;
+      liveClock.textContent = `${displayHours}:${clockMinutes}:${clockSeconds} ${clockAmpm}`;
+
+      // Date
+      const options = { weekday: 'long', year: 'numeric', month: 'short', day: 'numeric' };
+      liveDate.textContent = now.toLocaleDateString(undefined, options);
+
+      // Update Preview
+      previewName.textContent = nameInput.value.trim() || 'Your Name';
+      previewPlace.textContent = placeInput.value.trim() || 'Client Location';
+      
+      const formattedTime = getFormattedTime(now, timeFormat);
+      previewTime.textContent = formattedTime;
+      previewStamp.textContent = `${clockHours % 12 || 12}:${clockMinutes}`;
+    }
+
+    // Input event listeners
+    nameInput.addEventListener('input', () => {
+      localStorage.setItem('audit_name', nameInput.value);
+      updateClockAndPreview();
+    });
+
+    placeInput.addEventListener('input', () => {
+      localStorage.setItem('audit_place', placeInput.value);
+      updateClockAndPreview();
+    });
+
+    function setPlace(placeName) {
+      placeInput.value = placeName;
+      localStorage.setItem('audit_place', placeName);
+      updateClockAndPreview();
+      showToast(`Selected: ${placeName}`);
+    }
+
+    function setFormat(fmt) {
+      timeFormat = fmt;
+      localStorage.setItem('audit_time_format', fmt);
+      document.getElementById('fmt1').classList.toggle('active', fmt === 'dot');
+      document.getElementById('fmt2').classList.toggle('active', fmt === 'colon');
+      updateClockAndPreview();
+    }
+
+    function getFullMessage() {
+      const name = nameInput.value.trim();
+      const place = placeInput.value.trim();
+      const time = getFormattedTime(new Date(), timeFormat);
+      return `${name}\n${place}\n${time}`;
+    }
+
+    function sendToWhatsApp() {
+      const message = getFullMessage();
+      const encodedMsg = encodeURIComponent(message);
+      
+      // Try native WhatsApp URL scheme first
+      const whatsappUrl = `whatsapp://send?text=${encodedMsg}`;
+      const webFallback = `https://api.whatsapp.com/send?text=${encodedMsg}`;
+
+      // Copy to clipboard as well for ultra convenience
+      navigator.clipboard.writeText(message).catch(() => {});
+
+      // Open WhatsApp
+      window.location.href = whatsappUrl;
+
+      // Fallback for browsers that block custom protocols
+      setTimeout(() => {
+        window.open(webFallback, '_blank');
+      }, 700);
+    }
+
+    function copyMessage() {
+      const message = getFullMessage();
+      navigator.clipboard.writeText(message).then(() => {
+        showToast('✓ Message copied! Paste directly in your group');
+      }).catch(() => {
+        showToast('Could not copy automatically');
+      });
+    }
+
+    function showToast(msg) {
+      toast.textContent = msg;
+      toast.classList.add('show');
+      setTimeout(() => {
+        toast.classList.remove('show');
+      }, 2500);
+    }
+
+    // Initialize
+    if (timeFormat === 'colon') {
+      setFormat('colon');
+    } else {
+      setFormat('dot');
+    }
+
+    setInterval(updateClockAndPreview, 1000);
+    updateClockAndPreview();
+  </script>
+</body>
+</html>
