@@ -6,7 +6,7 @@
   <meta name="theme-color" content="#075E54">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <title>Audit Arrival Reporter</title>
+  <title>Audit Arrival & Departure Reporter</title>
   <link rel="manifest" href="manifest.json">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -50,25 +50,77 @@
       max-width: 440px;
       display: flex;
       flex-direction: column;
-      gap: 16px;
+      gap: 14px;
       padding-bottom: 24px;
     }
 
-    /* Live Clock Banner */
-    .clock-card {
+    /* Session Switcher Tabs */
+    .session-tabs {
+      display: flex;
+      background: #1e293b;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 4px;
+      gap: 4px;
+    }
+
+    .tab-btn {
+      flex: 1;
+      padding: 12px 8px;
+      background: transparent;
+      border: none;
+      border-radius: 12px;
+      color: var(--text-muted);
+      font-size: 13px;
+      font-weight: 700;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 3px;
+      cursor: pointer;
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .tab-btn .tab-sub {
+      font-size: 10px;
+      font-weight: 500;
+      opacity: 0.75;
+    }
+
+    .tab-btn.active {
+      background: linear-gradient(135deg, #059669 0%, #10b981 100%);
+      color: #ffffff;
+      box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+    }
+
+    .tab-btn.evening.active {
+      background: linear-gradient(135deg, #0284c7 0%, #0ea5e9 100%);
+      box-shadow: 0 4px 12px rgba(14, 165, 233, 0.3);
+    }
+
+    /* Target Shuffled Time Display Banner */
+    .time-banner {
       background: linear-gradient(135deg, #064e3b 0%, #065f46 100%);
       border: 1px solid #059669;
       border-radius: 20px;
-      padding: 20px;
+      padding: 18px 20px;
       text-align: center;
-      box-shadow: 0 10px 25px -5px rgba(5, 150, 105, 0.3);
+      box-shadow: 0 10px 25px -5px rgba(5, 150, 105, 0.25);
+      position: relative;
+      transition: all 0.3s ease;
     }
 
-    .live-badge {
+    .time-banner.evening {
+      background: linear-gradient(135deg, #0c4a6e 0%, #075985 100%);
+      border-color: #0284c7;
+      box-shadow: 0 10px 25px -5px rgba(2, 132, 199, 0.25);
+    }
+
+    .banner-badge {
       display: inline-flex;
       align-items: center;
       gap: 6px;
-      background: rgba(0, 0, 0, 0.25);
+      background: rgba(0, 0, 0, 0.3);
       padding: 4px 12px;
       border-radius: 20px;
       font-size: 11px;
@@ -79,33 +131,66 @@
       margin-bottom: 8px;
     }
 
-    .live-dot {
-      width: 8px;
-      height: 8px;
+    .time-banner.evening .banner-badge {
+      color: #7dd3fc;
+    }
+
+    .banner-badge-dot {
+      width: 7px;
+      height: 7px;
       background-color: #34d399;
       border-radius: 50%;
-      animation: pulse 1.5s infinite;
     }
 
-    @keyframes pulse {
-      0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(52, 211, 153, 0.7); }
-      70% { transform: scale(1.1); box-shadow: 0 0 0 8px rgba(52, 211, 153, 0); }
-      100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(52, 211, 153, 0); }
+    .time-banner.evening .banner-badge-dot {
+      background-color: #38bdf8;
     }
 
-    .clock-time {
-      font-size: 38px;
+    .time-display-row {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+    }
+
+    .banner-time {
+      font-size: 44px;
       font-weight: 800;
-      letter-spacing: 1px;
+      letter-spacing: 0.5px;
       color: #ffffff;
       font-variant-numeric: tabular-nums;
+      line-height: 1.1;
     }
 
-    .clock-date {
-      font-size: 13px;
+    .btn-shuffle {
+      background: rgba(255, 255, 255, 0.15);
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      color: #ffffff;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 18px;
+      transition: all 0.2s;
+    }
+
+    .btn-shuffle:active {
+      transform: rotate(90deg) scale(0.9);
+      background: rgba(255, 255, 255, 0.3);
+    }
+
+    .banner-date {
+      font-size: 12px;
       color: #a7f3d0;
-      margin-top: 4px;
+      margin-top: 6px;
       font-weight: 500;
+    }
+
+    .time-banner.evening .banner-date {
+      color: #bae6fd;
     }
 
     /* Main Form Card */
@@ -113,19 +198,19 @@
       background-color: var(--card-bg);
       border: 1px solid var(--border);
       border-radius: 20px;
-      padding: 20px;
+      padding: 18px;
       box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
     }
 
     .field-group {
-      margin-bottom: 16px;
+      margin-bottom: 14px;
     }
 
     .field-label {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      font-size: 13px;
+      font-size: 12px;
       font-weight: 600;
       color: var(--text-muted);
       margin-bottom: 6px;
@@ -136,7 +221,7 @@
       background-color: var(--input-bg);
       border: 1.5px solid var(--border);
       border-radius: 12px;
-      padding: 12px 14px;
+      padding: 11px 14px;
       color: var(--text);
       font-size: 15px;
       font-weight: 500;
@@ -149,7 +234,7 @@
       box-shadow: 0 0 0 3px rgba(37, 211, 102, 0.2);
     }
 
-    /* Client Place Chips / Suggestions */
+    /* Client Place Chips */
     .chips-container {
       display: flex;
       flex-wrap: wrap;
@@ -169,15 +254,77 @@
       transition: all 0.15s;
     }
 
-    .chip:active {
-      transform: scale(0.95);
+    .chip:active, .chip.active {
       background: var(--wa-light-green);
+      border-color: var(--wa-green);
       color: #fff;
     }
 
-    /* WhatsApp Preview Card */
-    .preview-section {
+    /* Quick Minute Range Chips */
+    .minute-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 5px;
       margin-top: 6px;
+    }
+
+    .min-chip {
+      background: #334155;
+      border: 1px solid #475569;
+      color: #e2e8f0;
+      padding: 5px 9px;
+      border-radius: 8px;
+      font-size: 11px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .min-chip:hover {
+      background: #475569;
+    }
+
+    .min-chip.active {
+      background: #059669;
+      border-color: #34d399;
+      color: #ffffff;
+    }
+
+    .time-banner.evening ~ .card .min-chip.active,
+    body.is-evening .min-chip.active {
+      background: #0284c7;
+      border-color: #38bdf8;
+    }
+
+    /* Format choice */
+    .format-row {
+      display: flex;
+      gap: 8px;
+      margin-top: 4px;
+    }
+
+    .format-btn {
+      flex: 1;
+      padding: 6px;
+      background: #334155;
+      border: 1px solid #475569;
+      border-radius: 8px;
+      color: #cbd5e1;
+      font-size: 11px;
+      font-weight: 600;
+      cursor: pointer;
+      text-align: center;
+    }
+
+    .format-btn.active {
+      background: var(--wa-light-green);
+      border-color: var(--wa-green);
+      color: #fff;
+    }
+
+    /* WhatsApp Preview */
+    .preview-section {
+      margin-top: 4px;
     }
 
     .preview-header {
@@ -206,6 +353,7 @@
       color: #e9edef;
       border-radius: 10px 0 10px 10px;
       padding: 8px 12px 6px 12px;
+      min-width: 140px;
       max-width: 88%;
       box-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
       position: relative;
@@ -228,8 +376,8 @@
     }
 
     .bubble-line.time {
-      font-weight: 500;
-      color: #e9edef;
+      font-weight: 600;
+      color: #a7f3d0;
     }
 
     .bubble-meta {
@@ -289,6 +437,78 @@
       padding: 12px;
     }
 
+    /* Simulation Demo Box */
+    .demo-card {
+      background: #111827;
+      border: 1px dashed #374151;
+      border-radius: 14px;
+      padding: 12px 14px;
+      margin-top: 4px;
+    }
+
+    .demo-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 12px;
+      font-weight: 600;
+      color: #9ca3af;
+      margin-bottom: 8px;
+    }
+
+    .demo-row {
+      display: flex;
+      gap: 6px;
+      overflow-x: auto;
+      padding-bottom: 4px;
+    }
+
+    .demo-item {
+      flex: 1;
+      min-width: 90px;
+      background: #1f2937;
+      border: 1px solid #374151;
+      border-radius: 8px;
+      padding: 8px 6px;
+      text-align: center;
+    }
+
+    .demo-item.today {
+      border-color: #10b981;
+      background: rgba(16, 185, 129, 0.1);
+    }
+
+    .demo-day {
+      font-size: 10px;
+      color: #9ca3af;
+      font-weight: 500;
+      margin-bottom: 2px;
+    }
+
+    .demo-val {
+      font-size: 13px;
+      font-weight: 700;
+      color: #f3f4f6;
+    }
+
+    .demo-simulate-btn {
+      margin-top: 8px;
+      width: 100%;
+      background: #374151;
+      border: none;
+      border-radius: 8px;
+      color: #d1d5db;
+      font-size: 11px;
+      font-weight: 600;
+      padding: 6px 10px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .demo-simulate-btn:hover {
+      background: #4b5563;
+    }
+
     /* Toast notification */
     .toast {
       position: fixed;
@@ -312,47 +532,42 @@
       transform: translateX(-50%) translateY(0);
       opacity: 1;
     }
-
-    /* Quick settings / format options */
-    .format-row {
-      display: flex;
-      gap: 8px;
-      margin-top: 4px;
-    }
-
-    .format-btn {
-      flex: 1;
-      padding: 6px;
-      background: #334155;
-      border: 1px solid #475569;
-      border-radius: 8px;
-      color: #cbd5e1;
-      font-size: 11px;
-      font-weight: 600;
-      cursor: pointer;
-      text-align: center;
-    }
-
-    .format-btn.active {
-      background: var(--wa-light-green);
-      border-color: var(--wa-green);
-      color: #fff;
-    }
   </style>
 </head>
 <body>
 
   <div class="container">
-    <!-- Live Clock -->
-    <div class="clock-card">
-      <div class="live-badge">
-        <span class="live-dot"></span> Live Clock
-      </div>
-      <div class="clock-time" id="liveClock">00:00:00 AM</div>
-      <div class="clock-date" id="liveDate">Loading date...</div>
+
+    <!-- Session Tabs (Punch In vs Punch Out) -->
+    <div class="session-tabs">
+      <button class="tab-btn active" id="tabMorning" onclick="switchSession('morning')">
+        <span>☀️ Morning Punch In</span>
+        <span class="tab-sub">Window: 9.00AM – 9.05AM</span>
+      </button>
+      <button class="tab-btn evening" id="tabEvening" onclick="switchSession('evening')">
+        <span>🌙 Evening Punch Out</span>
+        <span class="tab-sub">Window: 5.00PM – 5.10PM</span>
+      </button>
     </div>
 
-    <!-- Main Card -->
+    <!-- Shuffled Target Time Card -->
+    <div class="time-banner" id="timeBanner">
+      <div class="banner-badge" id="bannerBadge">
+        <span class="banner-badge-dot"></span>
+        <span id="badgeText">Today's Auto-Shuffled Time</span>
+      </div>
+      
+      <div class="time-display-row">
+        <div class="banner-time" id="bannerTime">9.00AM</div>
+        <button class="btn-shuffle" onclick="shuffleCurrentSession()" title="Shuffle to another minute within window">
+          🎲
+        </button>
+      </div>
+
+      <div class="banner-date" id="bannerDate">Loading date...</div>
+    </div>
+
+    <!-- Form Inputs Card -->
     <div class="card">
       <!-- Intern Name -->
       <div class="field-group">
@@ -379,10 +594,21 @@
         </div>
       </div>
 
-      <!-- Time Format Choice -->
+      <!-- Shuffled Time & Quick Selector (Row 3) -->
       <div class="field-group">
         <div class="field-label">
-          <span>Time Style (Row 3)</span>
+          <span id="timeFieldLabel">Shuffled Time (Row 3)</span>
+          <span style="font-size: 10px; color: #64748b;">Tap any to pick directly</span>
+        </div>
+        <div class="minute-chips" id="minuteChipsContainer">
+          <!-- Populated dynamically based on morning / evening -->
+        </div>
+      </div>
+
+      <!-- Time Style (Dot vs Colon) -->
+      <div class="field-group">
+        <div class="field-label">
+          <span>Time Style</span>
         </div>
         <div class="format-row">
           <button class="format-btn active" id="fmt1" onclick="setFormat('dot')">9.00AM (Screenshot style)</button>
@@ -404,7 +630,7 @@
             <div class="bubble-line place" id="previewPlace">Jayalanka</div>
             <div class="bubble-line time" id="previewTime">9.00AM</div>
             <div class="bubble-meta">
-              <span id="previewStamp">00:00</span>
+              <span id="previewStamp">09:00</span>
               <span class="ticks">✓✓</span>
             </div>
           </div>
@@ -425,25 +651,50 @@
         📋 Copy Formatted Text
       </button>
     </div>
+
+    <!-- Day-by-Day Demo Simulator -->
+    <div class="demo-card">
+      <div class="demo-header">
+        <span>📅 Day-by-Day Shuffle Preview (Demo)</span>
+        <span style="color: #10b981; font-size: 11px;">Auto-Shuffled</span>
+      </div>
+      <div class="demo-row" id="demoRow">
+        <!-- Rendered via JS -->
+      </div>
+      <button class="demo-simulate-btn" onclick="simulateNewDays()">
+        🔄 Simulate Next 3 Days
+      </button>
+    </div>
+
   </div>
 
-  <div id="toast" class="toast">Message copied to clipboard!</div>
+  <div id="toast" class="toast">Message copied!</div>
 
   <script>
-    // State management
+    // State
+    let currentSession = 'morning'; // 'morning' (9:00 - 9:05 AM) or 'evening' (5:00 - 5:10 PM)
     let timeFormat = localStorage.getItem('audit_time_format') || 'dot'; // 'dot' e.g. 9.00AM, 'colon' e.g. 9:00 AM
+    let currentMinute = 0; // Selected minute offset (0..5 for morning, 0..10 for evening)
 
+    // Elements
+    const tabMorning = document.getElementById('tabMorning');
+    const tabEvening = document.getElementById('tabEvening');
+    const timeBanner = document.getElementById('timeBanner');
+    const bannerBadge = document.getElementById('bannerBadge');
+    const badgeText = document.getElementById('badgeText');
+    const bannerTime = document.getElementById('bannerTime');
+    const bannerDate = document.getElementById('bannerDate');
     const nameInput = document.getElementById('nameInput');
     const placeInput = document.getElementById('placeInput');
-    const liveClock = document.getElementById('liveClock');
-    const liveDate = document.getElementById('liveDate');
     const previewName = document.getElementById('previewName');
     const previewPlace = document.getElementById('previewPlace');
     const previewTime = document.getElementById('previewTime');
     const previewStamp = document.getElementById('previewStamp');
+    const minuteChipsContainer = document.getElementById('minuteChipsContainer');
+    const demoRow = document.getElementById('demoRow');
     const toast = document.getElementById('toast');
 
-    // Load saved data
+    // Load saved settings
     if (localStorage.getItem('audit_name')) {
       nameInput.value = localStorage.getItem('audit_name');
     }
@@ -451,61 +702,153 @@
       placeInput.value = localStorage.getItem('audit_place');
     }
 
-    // Format helper
-    function getFormattedTime(date, format) {
-      let hours = date.getHours();
-      const minutes = date.getMinutes();
-      const ampm = hours >= 12 ? 'PM' : 'AM';
-      hours = hours % 12;
-      hours = hours ? hours : 12; // 0 becomes 12
-      const strMinutes = minutes < 10 ? '0' + minutes : minutes;
+    // Auto-detect Morning vs Evening based on current hour
+    const nowHour = new Date().getHours();
+    if (nowHour >= 13) {
+      currentSession = 'evening';
+    } else {
+      currentSession = 'morning';
+    }
+
+    // Date Helper (YYYY-MM-DD)
+    function getDateKey(d = new Date()) {
+      const year = d.getFullYear();
+      const month = String(d.getMonth() + 1).padStart(2, '0');
+      const day = String(d.getDate()).padStart(2, '0');
+      return `${year}-${month}-${day}`;
+    }
+
+    // Deterministic or persistent day-by-day shuffle logic
+    function getOrGenerateDayMinute(session, dateKey = getDateKey()) {
+      const storageKey = `audit_shuffle_${session}_${dateKey}`;
+      const savedMinute = localStorage.getItem(storageKey);
+      if (savedMinute !== null) {
+        return parseInt(savedMinute, 10);
+      }
+
+      // Generate a new minute for this day
+      const maxMinute = session === 'morning' ? 5 : 10;
+      
+      // Look at yesterday's minute to guarantee day-by-day variety
+      const yesterday = new Date();
+      yesterday.setDate(yesterday.getDate() - 1);
+      const yesterdayKey = `audit_shuffle_${session}_${getDateKey(yesterday)}`;
+      const prevMinute = localStorage.getItem(yesterdayKey);
+
+      let newMinute;
+      let attempts = 0;
+      do {
+        newMinute = Math.floor(Math.random() * (maxMinute + 1));
+        attempts++;
+      } while (prevMinute !== null && parseInt(prevMinute, 10) === newMinute && attempts < 10);
+
+      localStorage.setItem(storageKey, newMinute);
+      return newMinute;
+    }
+
+    // Format time representation
+    function formatTime(session, minute, format = timeFormat) {
+      const baseHour = session === 'morning' ? 9 : 5;
+      const ampm = session === 'morning' ? 'AM' : 'PM';
+      const strMin = String(minute).padStart(2, '0');
 
       if (format === 'dot') {
-        return `${hours}.${strMinutes}${ampm}`; // Matches screenshot e.g. 9.00AM
+        return `${baseHour}.${strMin}${ampm}`; // e.g. 9.00AM, 9.03AM, 5.04PM
       } else {
-        return `${hours}:${strMinutes} ${ampm}`;
+        return `${baseHour}:${strMin} ${ampm}`; // e.g. 9:00 AM, 9:03 AM, 5:04 PM
       }
     }
 
-    function updateClockAndPreview() {
-      const now = new Date();
+    function switchSession(session) {
+      currentSession = session;
+      document.body.classList.toggle('is-evening', session === 'evening');
 
-      // Update Live Clock Display
-      const clockHours = now.getHours();
-      const clockMinutes = String(now.getMinutes()).padStart(2, '0');
-      const clockSeconds = String(now.getSeconds()).padStart(2, '0');
-      const clockAmpm = clockHours >= 12 ? 'PM' : 'AM';
-      const displayHours = clockHours % 12 || 12;
-      liveClock.textContent = `${displayHours}:${clockMinutes}:${clockSeconds} ${clockAmpm}`;
+      tabMorning.classList.toggle('active', session === 'morning');
+      tabEvening.classList.toggle('active', session === 'evening');
+      timeBanner.classList.toggle('evening', session === 'evening');
 
-      // Date
-      const options = { weekday: 'long', year: 'numeric', month: 'short', day: 'numeric' };
-      liveDate.textContent = now.toLocaleDateString(undefined, options);
+      badgeText.textContent = session === 'morning' 
+        ? "☀️ Morning Punch In (9:00 – 9:05 AM)" 
+        : "🌙 Evening Punch Out (5:00 – 5:10 PM)";
 
-      // Update Preview
-      previewName.textContent = nameInput.value.trim() || 'Your Name';
-      previewPlace.textContent = placeInput.value.trim() || 'Client Location';
-      
-      const formattedTime = getFormattedTime(now, timeFormat);
-      previewTime.textContent = formattedTime;
-      previewStamp.textContent = `${clockHours % 12 || 12}:${clockMinutes}`;
+      currentMinute = getOrGenerateDayMinute(currentSession);
+      renderMinuteChips();
+      updateDisplay();
+      renderDemoRow();
     }
 
-    // Input event listeners
+    function shuffleCurrentSession() {
+      const maxMinute = currentSession === 'morning' ? 5 : 10;
+      let nextMinute;
+      let attempts = 0;
+      do {
+        nextMinute = Math.floor(Math.random() * (maxMinute + 1));
+        attempts++;
+      } while (nextMinute === currentMinute && attempts < 10);
+
+      currentMinute = nextMinute;
+      // Save for today
+      localStorage.setItem(`audit_shuffle_${currentSession}_${getDateKey()}`, currentMinute);
+      
+      renderMinuteChips();
+      updateDisplay();
+      showToast(`🎲 Shuffled to ${formatTime(currentSession, currentMinute)}`);
+    }
+
+    function pickMinute(min) {
+      currentMinute = min;
+      localStorage.setItem(`audit_shuffle_${currentSession}_${getDateKey()}`, currentMinute);
+      renderMinuteChips();
+      updateDisplay();
+    }
+
+    function renderMinuteChips() {
+      const maxMinute = currentSession === 'morning' ? 5 : 10;
+      minuteChipsContainer.innerHTML = '';
+
+      for (let m = 0; m <= maxMinute; m++) {
+        const chip = document.createElement('span');
+        chip.className = `min-chip ${m === currentMinute ? 'active' : ''}`;
+        chip.textContent = formatTime(currentSession, m);
+        chip.onclick = () => pickMinute(m);
+        minuteChipsContainer.appendChild(chip);
+      }
+    }
+
+    function updateDisplay() {
+      const formatted = formatTime(currentSession, currentMinute);
+      bannerTime.textContent = formatted;
+
+      // Date string
+      const options = { weekday: 'long', year: 'numeric', month: 'short', day: 'numeric' };
+      bannerDate.textContent = new Date().toLocaleDateString(undefined, options);
+
+      // Preview bubble
+      previewName.textContent = nameInput.value.trim() || 'Ajmal';
+      previewPlace.textContent = placeInput.value.trim() || 'Jayalanka';
+      previewTime.textContent = formatted;
+
+      // Meta stamp in preview
+      const baseHour = currentSession === 'morning' ? 9 : 5;
+      const strMin = String(currentMinute).padStart(2, '0');
+      previewStamp.textContent = `${String(baseHour).padStart(2, '0')}:${strMin}`;
+    }
+
+    // Input listeners
     nameInput.addEventListener('input', () => {
       localStorage.setItem('audit_name', nameInput.value);
-      updateClockAndPreview();
+      updateDisplay();
     });
 
     placeInput.addEventListener('input', () => {
       localStorage.setItem('audit_place', placeInput.value);
-      updateClockAndPreview();
+      updateDisplay();
     });
 
     function setPlace(placeName) {
       placeInput.value = placeName;
       localStorage.setItem('audit_place', placeName);
-      updateClockAndPreview();
+      updateDisplay();
       showToast(`Selected: ${placeName}`);
     }
 
@@ -514,13 +857,15 @@
       localStorage.setItem('audit_time_format', fmt);
       document.getElementById('fmt1').classList.toggle('active', fmt === 'dot');
       document.getElementById('fmt2').classList.toggle('active', fmt === 'colon');
-      updateClockAndPreview();
+      renderMinuteChips();
+      updateDisplay();
+      renderDemoRow();
     }
 
     function getFullMessage() {
-      const name = nameInput.value.trim();
-      const place = placeInput.value.trim();
-      const time = getFormattedTime(new Date(), timeFormat);
+      const name = nameInput.value.trim() || 'Ajmal';
+      const place = placeInput.value.trim() || 'Jayalanka';
+      const time = formatTime(currentSession, currentMinute);
       return `${name}\n${place}\n${time}`;
     }
 
@@ -528,17 +873,16 @@
       const message = getFullMessage();
       const encodedMsg = encodeURIComponent(message);
       
-      // Try native WhatsApp URL scheme first
       const whatsappUrl = `whatsapp://send?text=${encodedMsg}`;
       const webFallback = `https://api.whatsapp.com/send?text=${encodedMsg}`;
 
-      // Copy to clipboard as well for ultra convenience
+      // Copy to clipboard
       navigator.clipboard.writeText(message).catch(() => {});
 
       // Open WhatsApp
       window.location.href = whatsappUrl;
 
-      // Fallback for browsers that block custom protocols
+      // Fallback
       setTimeout(() => {
         window.open(webFallback, '_blank');
       }, 700);
@@ -547,7 +891,7 @@
     function copyMessage() {
       const message = getFullMessage();
       navigator.clipboard.writeText(message).then(() => {
-        showToast('✓ Message copied! Paste directly in your group');
+        showToast('✓ Message copied to clipboard!');
       }).catch(() => {
         showToast('Could not copy automatically');
       });
@@ -561,6 +905,42 @@
       }, 2500);
     }
 
+    // Demo Simulation Generator
+    let simOffset = 0;
+    function renderDemoRow() {
+      demoRow.innerHTML = '';
+      const days = ['Today', 'Tomorrow', 'Day 3', 'Day 4'];
+      const maxMinute = currentSession === 'morning' ? 5 : 10;
+      
+      // Seeded or simulated values
+      let lastMin = currentMinute;
+      for (let i = 0; i < 4; i++) {
+        let minVal;
+        if (i === 0) {
+          minVal = currentMinute;
+        } else {
+          // Guaranteed different from previous day to show realistic shuffle
+          minVal = (lastMin + (i * 2) + simOffset) % (maxMinute + 1);
+          if (minVal === lastMin) minVal = (minVal + 1) % (maxMinute + 1);
+          lastMin = minVal;
+        }
+
+        const item = document.createElement('div');
+        item.className = `demo-item ${i === 0 ? 'today' : ''}`;
+        item.innerHTML = `
+          <div class="demo-day">${days[i]}</div>
+          <div class="demo-val">${formatTime(currentSession, minVal)}</div>
+        `;
+        demoRow.appendChild(item);
+      }
+    }
+
+    function simulateNewDays() {
+      simOffset = (simOffset + 1) % 5;
+      renderDemoRow();
+      showToast('🔄 Generated fresh 4-day shuffle preview!');
+    }
+
     // Initialize
     if (timeFormat === 'colon') {
       setFormat('colon');
@@ -568,8 +948,8 @@
       setFormat('dot');
     }
 
-    setInterval(updateClockAndPreview, 1000);
-    updateClockAndPreview();
+    switchSession(currentSession);
+    renderDemoRow();
   </script>
 </body>
 </html>
