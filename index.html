@@ -542,7 +542,7 @@
     <div class="session-tabs">
       <button class="tab-btn active" id="tabMorning" onclick="switchSession('morning')">
         <span>☀️ Morning Punch In</span>
-        <span class="tab-sub">Window: 9.00AM – 9.05AM</span>
+        <span class="tab-sub">Window: 9.00AM – 9.10AM</span>
       </button>
       <button class="tab-btn evening" id="tabEvening" onclick="switchSession('evening')">
         <span>🌙 Evening Punch Out</span>
@@ -727,7 +727,7 @@
       }
 
       // Generate a new minute for this day
-      const maxMinute = session === 'morning' ? 5 : 10;
+      const maxMinute = 10; // 0 to 10 for both morning (9.00-9.10AM) and evening (5.00-5.10PM)
       
       // Look at yesterday's minute to guarantee day-by-day variety
       const yesterday = new Date();
@@ -768,7 +768,7 @@
       timeBanner.classList.toggle('evening', session === 'evening');
 
       badgeText.textContent = session === 'morning' 
-        ? "☀️ Morning Punch In (9:00 – 9:05 AM)" 
+        ? "☀️ Morning Punch In (9:00 – 9:10 AM)" 
         : "🌙 Evening Punch Out (5:00 – 5:10 PM)";
 
       currentMinute = getOrGenerateDayMinute(currentSession);
@@ -778,7 +778,7 @@
     }
 
     function shuffleCurrentSession() {
-      const maxMinute = currentSession === 'morning' ? 5 : 10;
+      const maxMinute = 10;
       let nextMinute;
       let attempts = 0;
       do {
@@ -803,7 +803,7 @@
     }
 
     function renderMinuteChips() {
-      const maxMinute = currentSession === 'morning' ? 5 : 10;
+      const maxMinute = 10;
       minuteChipsContainer.innerHTML = '';
 
       for (let m = 0; m <= maxMinute; m++) {
@@ -910,7 +910,7 @@
     function renderDemoRow() {
       demoRow.innerHTML = '';
       const days = ['Today', 'Tomorrow', 'Day 3', 'Day 4'];
-      const maxMinute = currentSession === 'morning' ? 5 : 10;
+      const maxMinute = 10;
       
       // Seeded or simulated values
       let lastMin = currentMinute;
